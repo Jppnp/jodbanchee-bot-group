@@ -1,0 +1,17 @@
+# Secrets
+.env
+
+# Ledger data — real family finances, never commit
+data/
+*.json.tmp
+.ledger-*.tmp
+
+# Build output
+/bin/
+/jodbanchee
+/devchat
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
