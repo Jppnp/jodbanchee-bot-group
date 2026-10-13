@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jodbanchee/jodbanchee/internal/money"
+	"github.com/Jppnp/jodbanchee-bot-group/internal/money"
 )
 
 // Kind says whether an entry is money in or money out.

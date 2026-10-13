@@ -6,9 +6,9 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/jodbanchee/jodbanchee/internal/ledger"
-	"github.com/jodbanchee/jodbanchee/internal/line"
-	"github.com/jodbanchee/jodbanchee/internal/parser"
+	"github.com/Jppnp/jodbanchee-bot-group/internal/ledger"
+	"github.com/Jppnp/jodbanchee-bot-group/internal/line"
+	"github.com/Jppnp/jodbanchee-bot-group/internal/parser"
 )
 
 // Bot answers events. It does not talk to LINE itself, which keeps it easy

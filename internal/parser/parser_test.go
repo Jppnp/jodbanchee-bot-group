@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/jodbanchee/jodbanchee/internal/ledger"
-	"github.com/jodbanchee/jodbanchee/internal/money"
+	"github.com/Jppnp/jodbanchee-bot-group/internal/ledger"
+	"github.com/Jppnp/jodbanchee-bot-group/internal/money"
 )
 
 func baht(n int64) money.Satang { return money.Satang(n * 100) }

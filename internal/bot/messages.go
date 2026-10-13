@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jodbanchee/jodbanchee/internal/ledger"
+	"github.com/Jppnp/jodbanchee-bot-group/internal/ledger"
 )
 
 // All user-facing Thai text lives in this file so it is easy to review,

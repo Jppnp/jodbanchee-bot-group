@@ -1,5 +1,8 @@
 # จดบัญชี (jodbanchee)
 
+[![CI](https://github.com/Jppnp/jodbanchee-bot-group/actions/workflows/ci.yml/badge.svg)](https://github.com/Jppnp/jodbanchee-bot-group/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 บอท LINE สำหรับจดรายรับรายจ่ายในไลน์กลุ่ม ดึงเข้ากลุ่มครอบครัวแล้วพิมพ์ `+500 ขายผัก` หรือ `-120 ค่ากับข้าว` บอทจะบันทึกให้ และสรุปยอดได้ทุกเมื่อ
 
 *A self-hosted LINE bot that keeps an income/expense ledger for a group chat. Written in Go with zero third-party dependencies. Replies are in Thai. [English summary below](#english).*
@@ -51,6 +54,8 @@
 ต้องมี Go 1.24 ขึ้นไป
 
 ```bash
+git clone https://github.com/Jppnp/jodbanchee-bot-group.git
+cd jodbanchee-bot-group
 make chat        # หรือ go run ./cmd/devchat
 ```
 

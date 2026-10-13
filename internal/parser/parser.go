@@ -9,8 +9,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/jodbanchee/jodbanchee/internal/ledger"
-	"github.com/jodbanchee/jodbanchee/internal/money"
+	"github.com/Jppnp/jodbanchee-bot-group/internal/ledger"
+	"github.com/Jppnp/jodbanchee-bot-group/internal/money"
 )
 
 // Action is what the bot should do with a message.

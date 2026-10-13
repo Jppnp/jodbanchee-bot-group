@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jodbanchee/jodbanchee/internal/line"
+	"github.com/Jppnp/jodbanchee-bot-group/internal/line"
 )
 
 // Replier sends reply messages. *line.Client implements it.

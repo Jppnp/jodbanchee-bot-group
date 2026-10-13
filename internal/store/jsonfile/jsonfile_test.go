@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jodbanchee/jodbanchee/internal/ledger"
+	"github.com/Jppnp/jodbanchee-bot-group/internal/ledger"
 )
 
 func TestPersistsAcrossReopen(t *testing.T) {

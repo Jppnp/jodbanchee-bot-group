@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jodbanchee/jodbanchee/internal/ledger"
-	"github.com/jodbanchee/jodbanchee/internal/line"
-	"github.com/jodbanchee/jodbanchee/internal/store/jsonfile"
+	"github.com/Jppnp/jodbanchee-bot-group/internal/ledger"
+	"github.com/Jppnp/jodbanchee-bot-group/internal/line"
+	"github.com/Jppnp/jodbanchee-bot-group/internal/store/jsonfile"
 )
 
 const secret = "test-secret"
