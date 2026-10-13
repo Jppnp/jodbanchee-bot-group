@@ -33,8 +33,9 @@ type Entry struct {
 
 // Store persists entries. Implementations must be safe for concurrent use.
 type Store interface {
-	// Add saves e, assigns its ID and returns the saved entry.
-	Add(ctx context.Context, e Entry) (Entry, error)
+	// Add saves all entries or none of them, assigns increasing IDs in order,
+	// and returns the saved entries.
+	Add(ctx context.Context, entries []Entry) ([]Entry, error)
 	// List returns entries for chatID with from <= CreatedAt < to, oldest first.
 	List(ctx context.Context, chatID string, from, to time.Time) ([]Entry, error)
 	// DeleteLatestByUser removes the newest entry userID made in chatID.
@@ -87,23 +88,21 @@ func (s *Service) Record(ctx context.Context, chatID, userID string, items []New
 			return nil, ErrInvalidEntry
 		}
 	}
-	now := s.now().UTC()
-	saved := make([]Entry, 0, len(items))
-	for _, it := range items {
-		e, err := s.store.Add(ctx, Entry{
+	// Truncate to microseconds: that is what Postgres stores, so every store
+	// returns the same timestamps.
+	now := s.now().UTC().Truncate(time.Microsecond)
+	entries := make([]Entry, len(items))
+	for i, it := range items {
+		entries[i] = Entry{
 			ChatID:    chatID,
 			UserID:    userID,
 			Kind:      it.Kind,
 			Amount:    it.Amount,
 			Note:      cleanNote(it.Note),
 			CreatedAt: now,
-		})
-		if err != nil {
-			return saved, err
 		}
-		saved = append(saved, e)
 	}
-	return saved, nil
+	return s.store.Add(ctx, entries)
 }
 
 // Undo deletes the newest entry the user recorded in the chat.

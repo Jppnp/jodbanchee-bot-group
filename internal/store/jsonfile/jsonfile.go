@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"sync"
 	"time"
 
@@ -65,20 +66,29 @@ func Open(path string) (*Store, error) {
 }
 
 // Add implements ledger.Store.
-func (s *Store) Add(_ context.Context, e ledger.Entry) (ledger.Entry, error) {
+func (s *Store) Add(_ context.Context, entries []ledger.Entry) ([]ledger.Entry, error) {
+	if len(entries) == 0 {
+		return nil, nil
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	e.ID = s.data.LastID + 1
-	s.data.LastID = e.ID
-	s.data.Entries = append(s.data.Entries, e)
-	if err := s.flush(); err != nil {
-		// Roll back so memory and disk stay in sync.
-		s.data.Entries = s.data.Entries[:len(s.data.Entries)-1]
-		s.data.LastID--
-		return ledger.Entry{}, err
+	prevLen, prevID := len(s.data.Entries), s.data.LastID
+	saved := make([]ledger.Entry, len(entries))
+	for i, e := range entries {
+		s.data.LastID++
+		e.ID = s.data.LastID
+		saved[i] = e
 	}
-	return e, nil
+	s.data.Entries = append(s.data.Entries, saved...)
+
+	// One write for the whole batch makes it all-or-nothing.
+	if err := s.flush(); err != nil {
+		s.data.Entries = s.data.Entries[:prevLen]
+		s.data.LastID = prevID
+		return nil, err
+	}
+	return saved, nil
 }
 
 // List implements ledger.Store.
@@ -92,6 +102,7 @@ func (s *Store) List(_ context.Context, chatID string, from, to time.Time) ([]le
 			out = append(out, e)
 		}
 	}
+	sort.SliceStable(out, func(i, j int) bool { return out[i].CreatedAt.Before(out[j].CreatedAt) })
 	return out, nil
 }
 

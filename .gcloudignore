@@ -1,0 +1,9 @@
+# Files never uploaded by `gcloud run deploy --source .`
+# Keep secrets and local data out of the Cloud Build upload.
+.git
+.github/
+.env
+data/
+bin/
+docs/
+#!include:.gitignore

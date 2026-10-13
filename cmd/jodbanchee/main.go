@@ -17,6 +17,7 @@ import (
 	"github.com/Jppnp/jodbanchee-bot-group/internal/ledger"
 	"github.com/Jppnp/jodbanchee-bot-group/internal/line"
 	"github.com/Jppnp/jodbanchee-bot-group/internal/store/jsonfile"
+	"github.com/Jppnp/jodbanchee-bot-group/internal/store/postgres"
 )
 
 func main() {
@@ -33,20 +34,21 @@ func run(log *slog.Logger) error {
 		return err
 	}
 
-	store, err := jsonfile.Open(cfg.DataFile)
+	store, storeName, closeStore, err := openStore(cfg)
 	if err != nil {
 		return err
 	}
+	defer closeStore()
 
 	svc := ledger.NewService(store, cfg.Location)
 	b := bot.New(svc, log)
 	client := line.NewClient(cfg.ChannelAccessToken, cfg.LineAPIBase)
 
+	health := func(w http.ResponseWriter, _ *http.Request) { w.Write([]byte("ok")) }
 	mux := http.NewServeMux()
 	mux.Handle("POST /webhook", bot.NewWebhookHandler(cfg.ChannelSecret, b, client, log))
-	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
-		w.Write([]byte("ok"))
-	})
+	mux.HandleFunc("GET /health", health)
+	mux.HandleFunc("GET /healthz", health) // Cloud Run reserves /healthz; use /health there
 
 	srv := &http.Server{
 		Addr:              ":" + cfg.Port,
@@ -61,7 +63,7 @@ func run(log *slog.Logger) error {
 
 	errCh := make(chan error, 1)
 	go func() {
-		log.Info("listening", "addr", srv.Addr, "data_file", cfg.DataFile, "timezone", cfg.Location.String())
+		log.Info("listening", "addr", srv.Addr, "store", storeName, "timezone", cfg.Location.String())
 		errCh <- srv.ListenAndServe()
 	}()
 
@@ -77,4 +79,22 @@ func run(log *slog.Logger) error {
 		return srv.Shutdown(shutdownCtx)
 	}
 	return nil
+}
+
+// openStore picks Postgres when DATABASE_URL is set, otherwise the JSON file.
+func openStore(cfg config.Config) (store ledger.Store, name string, closeFn func(), err error) {
+	if cfg.DatabaseURL != "" {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		pg, err := postgres.Open(ctx, cfg.DatabaseURL)
+		if err != nil {
+			return nil, "", nil, err
+		}
+		return pg, "postgres", func() { pg.Close() }, nil
+	}
+	fs, err := jsonfile.Open(cfg.DataFile)
+	if err != nil {
+		return nil, "", nil, err
+	}
+	return fs, "jsonfile:" + cfg.DataFile, func() {}, nil
 }

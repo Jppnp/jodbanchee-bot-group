@@ -13,6 +13,7 @@ type Config struct {
 	ChannelSecret      string
 	ChannelAccessToken string
 	Port               string
+	DatabaseURL        string // when set, Postgres is used instead of DataFile
 	DataFile           string
 	Location           *time.Location
 	LineAPIBase        string
@@ -24,6 +25,7 @@ func Load() (Config, error) {
 		ChannelSecret:      os.Getenv("LINE_CHANNEL_SECRET"),
 		ChannelAccessToken: os.Getenv("LINE_CHANNEL_ACCESS_TOKEN"),
 		Port:               getenv("PORT", "8080"),
+		DatabaseURL:        os.Getenv("DATABASE_URL"),
 		DataFile:           getenv("DATA_FILE", "data/ledger.json"),
 		LineAPIBase:        getenv("LINE_API_BASE", ""),
 	}

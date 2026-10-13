@@ -1,4 +1,4 @@
-.PHONY: run chat test lint build docker
+.PHONY: run chat test db test-pg lint build docker
 
 ## run: start the webhook server (reads .env)
 run:
@@ -11,6 +11,14 @@ chat:
 ## test: run all tests with the race detector
 test:
 	go test -race ./...
+
+## db: start a throwaway Postgres on :5432 for tests (needs Docker)
+db:
+	docker run -d --rm --name jodbanchee-pg -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:17
+
+## test-pg: run all tests, including the Postgres store's (run `make db` first)
+test-pg:
+	TEST_DATABASE_URL='postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable' go test -race ./...
 
 ## lint: formatting and vet
 lint:
